@@ -56,6 +56,15 @@ ORDER BY total_paiement;
 3 Affichez en une seule requête les taux de paiement par cash et par paiement
 électronique
 SELECT
-   SUM(CASE WHEN payment = 'Cash' THEN cost ELSE 0 END) / SUM(cost) * 100 AS cash_payment,
-   SUM(CASE WHEN payment != 'Cash' THEN cost ELSE 0 END) / SUM(cost) * 100 AS electronic_payment
-FROM purchases;
+    CASE
+        WHEN lower(payment) = 'cash' THEN 'Cash'
+        ELSE 'Electronique'
+    END AS type_paiement,
+    COUNT(*) AS total,
+    COUNT(*) * 100.0 / SUM(COUNT(*)) OVER() AS pourcentage
+FROM purchases
+GROUP BY
+    CASE
+        WHEN lower(payment) = 'cash' THEN 'Cash'
+        ELSE 'Electronique'
+    END;
