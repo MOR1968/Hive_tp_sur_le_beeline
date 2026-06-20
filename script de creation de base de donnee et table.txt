@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -e
+
+wget https://github.com/CodeMangler/udacity-hadoop-course/raw/master/Datasets/purchases.txt.gz
+gzip -d purchases.txt.gz
+
+beeline -u jdbc:hive2://localhost:10000 -n hadoop -p hadoop <<'EOF'
+
+CREATE DATABASE IF NOT EXISTS achatdb;
+USE achatdb;
+CREATE TABLE IF NOT EXISTS purchases (
+    pdate DATE,
+    ptime CHAR(5),
+    store STRING,
+    product STRING,
+    cost FLOAT,
+    payment STRING
+)
+ROW FORMAT DELIMITED  
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE;
+LOAD DATA LOCAL INPATH '/home/hadoop/purchases.txt' OVERWRITE INTO TABLE purchases;
+select count(*) from purchases;
+EOF
+
+
+#[hadoop@ip-172-31-79-5 ~]$ chmod +x /home/hadoop/script_tp3.sh
+#[hadoop@ip-172-31-79-5 ~]$ bash /home/hadoop/script_tp3.sh
+#enregistre le sur un fichier script.sh et l executer le par source script.sh
+
+
+
+
+
+tp3 requetes
+
+
+1 Affichez pour chaque tranche horaire (00, 01, 02,...,23) le nombre total de ventes.
+/*SELECT SUBSTR(ptime, 1, 2) AS heure,
+       count(*) AS nb_ventes
+FROM purchases
+GROUP BY SUBSTR(ptime, 1, 2)
+ORDER BY heure;*/
+
+2 Afficher par mode de paiement le montant total des achats effectués
+SELECT 
+    payment as Mode_paiement,
+    sum(cost) as total_paiement
+FROM purchases
+GROUP BY payment
+ORDER BY total_paiement;
+
+
+
+3 Affichez en une seule requête les taux de paiement par cash et par paiement
+électronique
+SELECT
+   SUM(CASE WHEN payment = 'Cash' THEN cost ELSE 0 END) / SUM(cost) * 100 AS cash_payment,
+   SUM(CASE WHEN payment != 'Cash' THEN cost ELSE 0 END) / SUM(cost) * 100 AS electronic_payment
+FROM purchases;

@@ -1,0 +1,30 @@
+show databases;
+use nom_de_la_base;
+
+
+0: jdbc:hive2://localhost:10000> taper ici les lignes qui suivent
+
+
+insert overwrite local directory '/tmp/rq5' row format delimited fields terminated by ','
+SELECT store, SUM(cost) AS total_sales
+FROM purchases
+GROUP BY store
+ORDER BY total_sales DESC;
+                                 
+
+
+
+enregistre le resultat d un requete ou exporter en tsv csv ici csv 
+
+ 
+
+commande a taper dans le beeline pour voir le contenue du repertoire a partir du beeline
+!sh ls /tmp/rq5  -- affiche 000000_0
+
+
+commande a taper dans le principale pour afficher le contenu du fichier pas dans le beeline
+cat /tmp/rq5/000000_0 
+
+ou 
+
+head -10 /tmp/rq5/000000_0
